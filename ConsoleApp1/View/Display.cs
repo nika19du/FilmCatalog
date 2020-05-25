@@ -130,8 +130,6 @@ namespace FilmCatalog.View
 
         private void UpdatePassword()
         {
-            //Console.Write("User name: ");
-            //var name = Console.ReadLine();
             var name = username;
             Console.Write("New password: ");
             var newPassword = Console.ReadLine();
@@ -140,8 +138,6 @@ namespace FilmCatalog.View
 
         private void UpdateUserName()
         {
-            //Console.Write("User name: ");
-            //var name = Console.ReadLine();
             var name = username;
             Console.Write("New name: ");
             var newName = Console.ReadLine();
@@ -219,8 +215,6 @@ namespace FilmCatalog.View
             Console.WriteLine("SHOW USER HISTORY.");
             for (int i = 0; i < 122; i++)
                 Console.Write("-");
-            //Console.WriteLine("\nEnter existing user name: ");
-            //var userName = Console.ReadLine();
             var userName = username;
             var user = userController.GetUser(userName);
             foreach (var u in user.MoviesList)
@@ -251,8 +245,6 @@ namespace FilmCatalog.View
         }
         public string ReturnName()
         {
-            //if (string.IsNullOrEmpty(username)==false)
-          //  this.RegisterOrLogin();
                 return username;
         }
         public void RegisterOrLogin()
@@ -759,8 +751,6 @@ namespace FilmCatalog.View
 
             string input = tagController.TagRead();
             Tag tag = tagController.GetAllTags().FirstOrDefault(x => x.Name == input);
-            //Console.WriteLine("Enter user name:");
-            //string userName = Console.ReadLine();
             validate.ValidateUserName(username);
             User user = userController.GetUser(username);
 
@@ -789,8 +779,6 @@ namespace FilmCatalog.View
             movie.Director = movieController.DirectorRead();
             movie.Description = movieController.DescriptionRead();
             movie.Genre = genreController.GenreRead();
-            //  Console.WriteLine("Enter exist user name: ");
-            //  var username = Console.ReadLine();
             var userName = username;
             var user = userController.GetUser(userName);
             movie.UserId = user.Id;

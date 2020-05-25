@@ -49,13 +49,13 @@ namespace FilmCatalog
 
             if (logIn == true)
             {
-                MessageBox.Show("Successfully log in");
+                MessageBox.Show("Successfully log in","Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.Close();
                 Display display = new Display(new FilmCatalogContext());
             }
             else
             {
-                MessageBox.Show("Unsuccessfully log in. Try again!");
+                MessageBox.Show("Unsuccessfully log in. Try again!","Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 loginUser = null;
                 passUser = null;
             }

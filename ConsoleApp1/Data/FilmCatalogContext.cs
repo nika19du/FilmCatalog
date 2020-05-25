@@ -18,7 +18,8 @@ namespace FilmCatalog.Data
 
         }
 
-        public virtual DbSet<Movie> Movies { get; set; }
+        //имплементация на класовете като таблици в бд, virtual e,заради nunit тестовете
+        public virtual DbSet<Movie> Movies { get; set; } 
 
         public virtual DbSet<Tag> Tags { get; set; }
 
@@ -32,7 +33,7 @@ namespace FilmCatalog.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (optionsBuilder.IsConfigured == false)
+            if (optionsBuilder.IsConfigured == false)//ако не е свързано с бд, то if го пр:
             {
                 optionsBuilder.UseSqlServer(Connection.ConnectionString);
             }
@@ -40,15 +41,15 @@ namespace FilmCatalog.Data
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+        {//правя връзките м-у класовете
+            // Many - to - Many Relationships:
             modelBuilder.Entity<MovieTag>().HasKey(x => new
             { x.MovieId, x.TagId });
 
+            //конфигурация на one-to-many relationship: 
             modelBuilder.Entity<MovieTag>().HasOne(x => x.Movie).WithMany(m => m.MovieTags).HasForeignKey(x => x.MovieId);
 
             modelBuilder.Entity<MovieTag>().HasOne(x => x.Tag).WithMany(k => k.MovieTags).HasForeignKey(x => x.TagId);
-
-            //modelBuilder.Entity<User>().HasMany(x => x.MoviesList).WithOne(x => x.User);
 
             base.OnModelCreating(modelBuilder);
         }

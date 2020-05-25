@@ -14,22 +14,18 @@ namespace FilmCatalog.Controller
     {
         private FilmCatalogContext context;
         private string result;
-        //private MovieController movieController;
         private Validate validation;
         private UserController userController;
         private static int rating4e;
-        // private Display display;
         public RatingController()
         {
             context = new FilmCatalogContext();
-            //movieController = new MovieController();
             validation = new Validate();
             userController = new UserController();
         }
         public RatingController(FilmCatalogContext context)
         {
             this.context = context;
-            //movieController = new MovieController(context);//davami stackoverflow za tva bex nego
             validation = new Validate(context);
             userController = new UserController(context);
         }

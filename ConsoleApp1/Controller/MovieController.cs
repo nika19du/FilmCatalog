@@ -203,7 +203,7 @@ namespace FilmCatalog.Controller
                 return -1;
             }
             else if (description.Equals("#") && paragraphCount == 1)
-            {
+            {//Тази проверка е когато user не е добавил текст но иска да сложи край с #
                 return 0;
             }
             else if (description.EndsWith("#"))
@@ -214,7 +214,7 @@ namespace FilmCatalog.Controller
         }
 
         private void UpdateGenres(Movie movie)
-        {
+        {//Може да обновяваме жанрът като добавим но жанр към съществуващ филм или да изтрием жанр 
             Console.WriteLine("Do you want to add a new genre or to remove an existing one.");
             string command = Console.ReadLine().Trim().ToLower();
             string genres = movie.Genre;
@@ -247,7 +247,7 @@ namespace FilmCatalog.Controller
                 {
                     Console.WriteLine("Which genres do you want to edit? (enter a number): ");
                     string inputIndex = Console.ReadLine().Trim();
-                    index = int.Parse(inputIndex) - 1;// -1 cuz we have array wich start from zero
+                    index = int.Parse(inputIndex) - 1;//-1 защото имаме масив който започва от 0,а потребителя нз за това и избира число от жанра както си е.
                     if (index < allGenres.Count() && index >= 0)
                     {
                         break;
@@ -273,7 +273,6 @@ namespace FilmCatalog.Controller
 
         private void UpdateGenresAdd(Movie movie)
         {
-            // Console.WriteLine("Enter genre name:");
             string genres = genreController.GenreRead();
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(movie.Genre + "," + genres);

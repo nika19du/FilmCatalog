@@ -32,15 +32,19 @@ namespace FilmCatalog
 
         }
 
-        public object Replay(string user,string mail,string password,string confirmPass)
+        public object Replay(string user, string mail, string password, string confirmPass)
         {
             user = this.textBoxUsername.Text.Trim();
+            mail = this.textBoxEmail.Text;
+            password = this.textBoxPassword.Text;
+            confirmPass = this.textBoxConfirmPass.Text;
+
             if (user == "" || mail == "" || password == "" || confirmPass == "")
             {
                 MessageBox.Show("Please enter values", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return Replay(user, mail, password, confirmPass);
             }
-           
+
             if (password != confirmPass)
             {
                 MessageBox.Show("Password not matching", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -90,13 +94,14 @@ namespace FilmCatalog
 
                         cmd.ExecuteNonQuery();
                         //Display display = new Display(new FilmCatalogContext());
+
+                        MessageBox.Show("Account successfully create.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        this.Close();
+                        Display display = new Display(new FilmCatalogContext());
                     }
                 }
                 con.Close();
             }
-            MessageBox.Show("Account successfully create.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            this.Dispose();
-            Display display = new Display(new FilmCatalogContext());
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -105,15 +110,15 @@ namespace FilmCatalog
         }
         private void labelLogin_Click(object sender, EventArgs e)
         {
-            using(Form2 form=new Form2())
+            using (Form2 form = new Form2())
             {
                 form.ShowDialog();
             }
-        } 
+        }
 
         private void RegisterForm_Load(object sender, EventArgs e)
         {
 
-        }  
+        }
     }
 }
