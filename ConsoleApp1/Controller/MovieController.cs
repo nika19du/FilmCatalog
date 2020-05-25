@@ -247,7 +247,7 @@ namespace FilmCatalog.Controller
                 {
                     Console.WriteLine("Which genres do you want to edit? (enter a number): ");
                     string inputIndex = Console.ReadLine().Trim();
-                    index = int.Parse(inputIndex) - 1;
+                    index = int.Parse(inputIndex) - 1;// -1 cuz we have array wich start from zero
                     if (index < allGenres.Count() && index >= 0)
                     {
                         break;
@@ -260,7 +260,7 @@ namespace FilmCatalog.Controller
             for (int i = 0; i < allGenres.Length; i++)
             {
                 if (i == index)
-                {
+                {//прескача жанрът който искаме да махнем.
                     continue;
                 }
                 sb.Append(allGenres[i] + ",");

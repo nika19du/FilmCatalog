@@ -17,7 +17,8 @@ namespace FilmCatalog.Controller
         //private MovieController movieController;
         private Validate validation;
         private UserController userController;
-       // private Display display;
+        private static int rating4e;
+        // private Display display;
         public RatingController()
         {
             context = new FilmCatalogContext();
@@ -61,37 +62,97 @@ namespace FilmCatalog.Controller
                     return this.AddRating();
                 }
                 Console.WriteLine(result);
+            } while (validation.ValidateMovieName(movieName) != 0);
 
-                //Console.Write("\nEnter User name: ");
-                //userName = Console.ReadLine();
-           //     userName = display.ReturnName();
-                //validator = validation.ValidateUserName(userName);
-                //if (validator == 0)
-                //{
-                //    result = "Successfully found user!";
-                //    // break;
-                //}
-                //else if (validator == -1)
-                //{
-                //    result = "Name cannot be empty!";
-                //}
-                //else if (validator == 1)
-                //{
-                //    result = "Such user doesn't exist!";
-                //    return this.AddRating();
-                //}
-                //Console.WriteLine(result);
-            } while (validation.ValidateMovieName(movieName) != 0);//&& validation.ValidateUserName(userName) != 0);
-
-            if (string.IsNullOrEmpty(Form2.loginUser)==false)
+            if (string.IsNullOrEmpty(Form2.loginUser) == false)
             {
                 userName = Form2.loginUser;
             }
-            if (string.IsNullOrEmpty(RegisterForm.user)==false)
+            if (string.IsNullOrEmpty(RegisterForm.user) == false)
             {
                 userName = RegisterForm.user;
             }
 
+            Movie movie = context.Movies.First(x => x.Name == movieName);
+            User user = context.Users.First(x => x.UserName == userName);
+
+            var answer = Setting(movie, user);
+
+            if (answer == "y") //TO DO YES-A ??!!
+            {
+                var r = context.Ratings.FirstOrDefault(x => x.MovieId == movie.Id); //1 user може да е добавил мн рейтинг към мн филми,избираме не първият филм от базата,а този който искаме.
+
+                foreach (var film in user.MoviesList)
+                {
+                    if (r.MovieId == film.Id)
+                    {
+                        if (r != null)
+                        {
+                            ManipulationRating(rating, movieName, validator);
+                            r.Score = rating4e;
+                            context.Ratings.Update(r);
+                            context.SaveChanges();
+                            return "Successfully updated rating in database.";
+                        }
+                    }
+                }
+            }
+            if (answer == "yep")//if movieID=userId but this movie is added by other user
+            {
+                var a = userController.GetUser(user.UserName);
+                var u = context.Ratings.FirstOrDefault(x => x.User.Id == a.Id);
+
+                foreach (var rt in u.User.Ratings)
+                {
+                    if (rt.MovieId == a.Id)
+                    {
+                        ManipulationRating(rating, movieName, validator);
+                        rt.Score = rating4e;
+                        context.Ratings.Update(u);
+                        context.SaveChanges();
+                        return "Successfully updated rating in database.";
+                    }
+                }
+            }
+            if (answer == "yey")
+            {
+                var a = userController.GetUser(user.UserName);
+                var m = context.Ratings.FirstOrDefault(x => x.MovieId == movie.Id);
+
+                foreach (var r in a.Ratings)
+                {
+                    if (m.MovieId == r.MovieId)
+                    {
+                        ManipulationRating(rating, movieName, validator);
+                        r.Score = rating4e;
+                        context.Ratings.Update(r);
+                        context.SaveChanges();
+                        return "Successfully updated rating in database.";
+                    }
+                }
+            }
+            if (answer == "n") return "The rating has not changed. It's still the same.";
+
+            if (answer == "r not exist")
+            {
+                ManipulationRating(rating, movieName, validator);
+
+                Rating ratingToAdd = new Rating
+                {
+                    Score = rating4e,
+                    Movie = movie,
+                    User = user
+                };
+                context.Ratings.Add(ratingToAdd);
+                userController.AddRating(ratingToAdd, user);
+                context.SaveChanges();
+                return "Successfully added rating to database.";
+            }
+            else return "";
+        }
+
+        private void ManipulationRating(int rating, string movieName, int validator)
+        {
             do
             {
                 try
@@ -108,6 +169,7 @@ namespace FilmCatalog.Controller
                     {
                         result = "Rating is valid.";
                         validator = 1;
+                        rating4e = rating;
                     }
                 }
                 catch
@@ -117,20 +179,68 @@ namespace FilmCatalog.Controller
                 }
                 Console.WriteLine(result);
             } while (validator != 1);
+        }
 
-            Movie movie = context.Movies.First(x => x.Name == movieName);
-            User user = context.Users.First(x => x.UserName == userName);
-            Rating ratingToAdd = new Rating
+        private string Setting(Movie movie, User user)
+        {
+            var a = userController.GetUser(user.UserName);
+            var u = context.Ratings.FirstOrDefault(x => x.User.Id == a.Id);
+            if (u == null) { return "r not exist"; }//v sluchaq nqmam user v reitinga ???
+
+            var m = context.Ratings.FirstOrDefault(x => x.MovieId == movie.Id);
+            if (m == null) { return "r not exist"; }//pr proverka, zajoto moje v ratings clasa da nqma dadeniq film i kato go lipsva go dobavqme bez da produljava nadolu 
+            string answer;
+
+            if (a.Ratings.FirstOrDefault(x => x.MovieId == m.MovieId) == null)
             {
-                Score = rating,
-                Movie = movie,
-                User = user
-            };
-            context.Ratings.Add(ratingToAdd);
-            userController.AddRating(ratingToAdd, user);
-            context.SaveChanges();
-            // Console.WriteLine("Rating added to database.");
-            return "Successfully added rating to database.";
+                return "r not exist";
+            }
+
+            foreach (var r in a.Ratings)//tova go izp kogato imam user koito updateva reiting kum chujd film
+            {
+                if (m.MovieId == r.MovieId)
+                {
+                    Console.WriteLine("You have been added rating in this movie.\nDo you want to update old rating? Yes or No?");
+                    answer = Console.ReadLine();
+                    if (answer == "Yes" || answer == "yes")
+                    {
+                        return "yey";
+                    }
+                    else { return "n"; }
+                }
+            }
+
+
+            if (u != null)
+            {
+                foreach (var film in a.MoviesList)
+                {
+                    if (m.MovieId == film.Id)//m.MovieId
+                    {
+                        Console.WriteLine("You have been added rating in this movie.\nDo you want to update old rating? Yes or No?");
+                        answer = Console.ReadLine();
+                        if (answer == "Yes" || answer == "yes")
+                        {
+                            return "y";
+                        }
+                        else { return "n"; }
+                    }
+                    else continue;
+                }
+                if (u.User.Id == u.MovieId)
+                {
+                    Console.WriteLine("You have been added rating in this movie.\nDo you want to update old rating? Yes or No?");
+                    answer = Console.ReadLine();
+                    if (answer == "Yes" || answer == "yes")
+                    {
+                        return "yep";
+                    }
+                    else { return "n"; }
+                }
+                else
+                { return ""; }
+            }
+            else { return "is null"; }
         }
 
         public double CalculateRating(IMovie movie)
