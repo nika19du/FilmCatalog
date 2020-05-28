@@ -525,6 +525,10 @@ namespace FilmCatalog.View
                 {
                     PrintMovies(movieTag.Movie);
                 }
+                if (movieTags.Count() == 0) 
+                { 
+                    Console.WriteLine("This tag has not been added to movies.");
+                }
             }
             ReturnToMainScreen();
         }
@@ -729,10 +733,27 @@ namespace FilmCatalog.View
 
             Console.WriteLine("\nEnter movie id:");
             int movieId = int.Parse(Console.ReadLine());
+            var m = movieController.GetMovie(movieId);
+            if (m == null)
+            {
+                Console.WriteLine($"Such movie doesn't exist.");
+                return;
+            }
             Console.WriteLine("Enter tag id:");
             int tagId = int.Parse(Console.ReadLine());
-            movieTagController.AddMovieTag(new MovieTag()
-            { MovieId = movieId, TagId = tagId });
+            var t = tagController.GetTag(tagId);
+            if (t == null)
+            {
+                Console.WriteLine($"Such tag doesn't exist.");
+                //this.ReturnToMainScreen();
+                return;
+            }
+            else if (t != null && m != null)
+            {
+                movieTagController.AddMovieTag(new MovieTag()
+                { MovieId = movieId, TagId = tagId });
+                Console.WriteLine($"Successfully added tag - {t.Name} to {m.Name} movie.");
+            }
 
             this.ReturnToMainScreen();
         }
@@ -763,7 +784,6 @@ namespace FilmCatalog.View
                 Tag tag1 = new Tag { Name = input, User = user };
                 tagController.AddTag(tag1);
                 userController.AddTag(tag1, user);
-                Console.WriteLine("Successfully added tag!");
             }
             this.ReturnToMainScreen();
         }
